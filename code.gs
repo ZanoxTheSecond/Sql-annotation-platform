@@ -77,7 +77,7 @@ function getHeapSize()//<=400, si 400 e putin la limita, max(size(query)) ~= 1,2
 
 function getHSLB()//heap size lower bound (>0, <=heapSize), =heapSize inseamna actualizare odata ce se pierde macar un query, sau se gaseste macar un request (submission)
 {
-  return 300
+  return 150
 }
 
 function compareQueries(a, b)
