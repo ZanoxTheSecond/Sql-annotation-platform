@@ -3,6 +3,7 @@ function main()
   //setupQueries(['train.json'])
   //setHeapQueries()
   //routine()
+  //ScriptApp.newTrigger('routine').timeBased().everyMinutes(1).create()
 }
 
 function timeMain()
@@ -33,8 +34,8 @@ function routine()
       noq++
   }
   
-  Logger.log('Number of requests (submissions) present in heap: ' + String(nor))
-  Logger.log('Number of queries present in heap: ' + String(noq))
+  //Logger.log('Number of requests (submissions) present in heap: ' + String(nor))
+  //Logger.log('Number of queries present in heap: ' + String(noq))
   
   var heapSize = getHeapSize()
   var hSLB = getHSLB()
@@ -209,7 +210,7 @@ function parseSubmissions(queryList)
   
   var date = new Date()
   var t1 = date.getSeconds()*1000 + date.getMilliseconds()
-  Logger.log(String(t1 - t0) + ' ms elapsed during parseSubmissions() window')
+  //Logger.log(String(t1 - t0) + ' ms elapsed during parseSubmissions() window')
   
   
   if(queryList == null)
@@ -236,7 +237,7 @@ function parseSubmissions(queryList)
   
   var date = new Date()
   var t2 = date.getSeconds()*1000 + date.getMilliseconds()
-  Logger.log(String(t2 - t0) + ' ms elapsed during the entire parseSubmissions() function')
+  //Logger.log(String(t2 - t0) + ' ms elapsed during the entire parseSubmissions() function')
   
   return queryList
  }
@@ -274,7 +275,7 @@ function setHeapQueries(queryList)
   
   var date = new Date()
   var t1 = date.getSeconds()*1000 + date.getMilliseconds()
-  Logger.log(String(t1 - t0) + ' ms elapsed during setHeapQueries() window')
+  //Logger.log(String(t1 - t0) + ' ms elapsed during setHeapQueries() window')
   
   var heapSize = getHeapSize()
   
@@ -291,7 +292,7 @@ function setHeapQueries(queryList)
   
   var date = new Date()
   var t2 = date.getSeconds()*1000 + date.getMilliseconds()
-  Logger.log(String(t2 - t0) + ' ms elapsed during the entire setHeapQueries() function')
+  //Logger.log(String(t2 - t0) + ' ms elapsed during the entire setHeapQueries() function')
 }
 
 function getSpecificQuery()
