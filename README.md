@@ -19,8 +19,15 @@
 
 -deploy the project as a web app, accessible to anyone and ran as if they were you.
 
-That's it, the page should be operational. The users may add up to four entries to any query. Keep in mind that the actual dataset may only update when the routine function runs, and that only happens if the number of requests present in the PropertiesService has exceeded a certain capacity
+That's it, the page should be operational. The users may add up to four entries to any query. Keep in mind that the actual dataset may only update when the routine function runs, and that only happens if the number of requests present in the PropertiesService has exceeded a certain capacity (by default 150)
 
 ==============================================================================================================================
 
-    
+    Maintenance and further customization:
+
+-you can use the loadQueries function to return an array of all queries (ordered) (with the initial dataset this runs in about 2-4 seconds)
+-you can use the dumpQueries function to update the dataset, as in dumpQueries(queryList) (with the initial dataset this runs in about 8-10 seconds)
+-you can change the maximum capacity of queries and requests in the PropertyService by modifying the return value of the getHeapSize function (although it should not exceed 400)
+-when the number of queries drops below the HSLB (heap size lower bound), the routine function triggers what is essentially a refill with queries in the PropertyService
+-similarly, when the number of requests gets above heapSize - HSLB, the routine function triggers a parsing and deletion of all requests
+-you can set the HSLB by modifying the return value of the getHSLB function
