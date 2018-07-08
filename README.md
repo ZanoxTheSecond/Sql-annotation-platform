@@ -12,7 +12,7 @@
 
 -run the setupQueries function, giving an array of names of json files within the drive as an argument, as in: setupQueries(['train.json'])"
 (note that the methods used to indentify the source files search throughout the entire drive, so, if you have multiple files with the same name, the script will choose one at random)
-  -this function will create a folder names 'DATA' at the root of the drive and, within, one ore more batches of query (generally one, more only if the one would exceed 40MB in size)
+  -this function will create a folder named 'DATA' at the root of the drive and, within, one ore more batches of queries (generally one, more only if the one would exceed 40MB in size)
   -the function will also store the id's of the folder and batches within the PropertiesService, so hypothetically, you can change the names, and even the location of these files without corrupting any of the ensuing processes)
 
 -create a periodic trigger that calls the routine function, and runs every minute, as in: "ScriptApp.newTrigger('routine').timeBased().everyMinutes(1).create()"
