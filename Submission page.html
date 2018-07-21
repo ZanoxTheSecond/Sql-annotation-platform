@@ -50,7 +50,8 @@
    
    
    <button onClick="tryToSubmit()">Submit</button>
-   
+   <br>
+   <p id="noSubs"></p>
     
   </body>
   
@@ -58,6 +59,8 @@
 </html>
 
 <script>
+
+var noSubs = 0
 
 var emailRegExp = /^\S+@\S+\.\S+$/
 var emailState = 'empty'
@@ -195,6 +198,8 @@ async function tryToSubmit()
  google.script.run.withSuccessHandler(passSignal).withUserObject(signal).submit(email, index, entries)
  while(signal.length == 0){await sleep(100)}
  alert("Your submission has been sent")
+ noSubs++
+ document.getElementById("noSubs").innerHTML = 'Number of submissions: ' + String(noSubs)
  getSpecificQuery()
  resetEntryBoxes()
 }
