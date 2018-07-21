@@ -3,8 +3,6 @@ function main()
   //setupQueries(['train.json'])
   //setHeapQueries()
   //routine()
-  var queryList = loadQueries()
-  countAnnotations(queryList)
 }
 
 function timeMain()
