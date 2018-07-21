@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+  </head>
+  <body>
+    
+    Number of queries: <input id="noQueries" type="text" readonly = true><br><br>
+    Total number of annotations: <input id="noAnot" type="text" readonly = true><br><br>
+    Number of queries with at least one annotation: <input id="noDescQ" type="text" readonly = true><br><br>
+    
+    <br>
+    Number of submissions in queue:<input id="nor" type="text" readonly = true><br><br>
+    Number of queries in queue:<input id="noq" type="text" readonly = true><br><br>
+    <br>
+    
+    <button onClick="getUsersStat()">Get users' number of annotations</button>
+    <pre id="userList"></pre>
+    
+  </body>
+</html>
+
+<script>
+
+var global = null
+
+window.setInterval(routine,1000)
+
+
+function sleep(ms) 
+{
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function onFailure()
+{
+
+}
+
+async function routine()
+{
+  global = null
+  google.script.run.withFailureHandler(onFailure)
+                            .withSuccessHandler(setGlobal)
+                            .getScriptVars()
+  while(!global)await sleep(100)
+  
+  document.getElementById("noQueries").value = String(global.noQueries)
+  document.getElementById("noAnot").value = String(global.noAnot)
+  document.getElementById("noDescQ").value = String(global.noDescQ)
+  
+  document.getElementById("nor").value = String(global.nor)
+  document.getElementById("noq").value = String(global.noq)
+}
+
+async function getUsersStat()
+{
+  document.getElementById("userList").innerHTML = 'LOADING...'
+  google.script.run.withFailureHandler(onFailure)
+                            .withSuccessHandler(setUserList)
+                            .getUsersList()
+}
+
+function setGlobal(g)
+{
+  global = g
+}
+
+function setUserList(s)
+{
+  document.getElementById("userList").innerHTML = s
+}
+</script>
