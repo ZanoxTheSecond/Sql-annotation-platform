@@ -4,7 +4,7 @@
     
 -create a google apps script project
 -modify the code.gs file to be identical with the one from here
--create a .html file with the same name and content as the one from here
+-create all .html files with the same name and content as the ones from here
 (you should, preferably, always run the main function which you modify to call the actual functions of interest)
 (alternatively, if you run the 'timeMain' function, you can time how quickly the main function runs; the duration of the execution will we displayed in the Logger, accessible with Ctrl+Enter)
 
