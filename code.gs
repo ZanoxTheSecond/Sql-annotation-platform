@@ -3,7 +3,8 @@ function main()
   //setupQueries(['train.json'])
   //setHeapQueries()
   //routine()
-  //ScriptApp.newTrigger('routine').timeBased().everyMinutes(1).create()
+  var queryList = loadQueries()
+  countAnnotations(queryList)
 }
 
 function timeMain()
@@ -34,8 +35,8 @@ function routine()
       noq++
   }
   
-  //Logger.log('Number of requests (submissions) present in heap: ' + String(nor))
-  //Logger.log('Number of queries present in heap: ' + String(noq))
+  Logger.log('Number of requests (submissions) present in heap: ' + String(nor))
+  Logger.log('Number of queries present in heap: ' + String(noq))
   
   var heapSize = getHeapSize()
   var hSLB = getHSLB()
@@ -46,11 +47,22 @@ function routine()
    queryList = parseSubmissions(queryList)
   if(noq < hSLB)
    setHeapQueries(queryList)
+  if(nor > heapSize - hSLB || noq < hSLB)
+    countAnnotations(queryList)
 }
 
-function doGet() 
+function doGet(e) 
 {
-  return HtmlService.createHtmlOutputFromFile('Submission page')
+  if(!e)
+    return HtmlService.createTemplateFromFile('Submission page').evaluate()
+  if(!e.parameter.page)
+    return HtmlService.createTemplateFromFile('Submission page').evaluate()
+  else
+    return HtmlService.createHtmlOutputFromFile(e.parameter.page)
+}
+
+function getScriptUrl() {
+ return ScriptApp.getService().getUrl();
 }
 
 function extend(a, b)
@@ -132,8 +144,15 @@ function setupQueries(jsonNames)
 function submit(email, index, entries)
 {
   var date = new Date()
+  var global = getScriptVars()
   PropertiesService.getScriptProperties().setProperty('request:' + String(date.getMilliseconds()) + String(date.getSeconds()), JSON.stringify([email, index, entries]) )
-  PropertiesService.getScriptProperties().deleteProperty('query:' + String(index))
+  global.nor++
+  if( PropertiesService.getScriptProperties().getProperty('query:' + String(index)) )
+  {
+    global.noq--
+    PropertiesService.getScriptProperties().deleteProperty('query:' + String(index))
+  }
+  setScriptVars(global)
 }
 
 function dumpQueries(queryList)
@@ -237,7 +256,11 @@ function parseSubmissions(queryList)
   
   var date = new Date()
   var t2 = date.getSeconds()*1000 + date.getMilliseconds()
-  //Logger.log(String(t2 - t0) + ' ms elapsed during the entire parseSubmissions() function')
+  Logger.log(String(t2 - t0) + ' ms elapsed during the entire parseSubmissions() function')
+  
+   var global = getScriptVars()
+  global.nor = 0
+  setScriptVars(global)
   
   return queryList
  }
@@ -292,7 +315,11 @@ function setHeapQueries(queryList)
   
   var date = new Date()
   var t2 = date.getSeconds()*1000 + date.getMilliseconds()
-  //Logger.log(String(t2 - t0) + ' ms elapsed during the entire setHeapQueries() function')
+  Logger.log(String(t2 - t0) + ' ms elapsed during the entire setHeapQueries() function')
+  
+  var global = getScriptVars()
+  global.noq = noq
+  setScriptVars(global)
 }
 
 function getSpecificQuery()
@@ -303,4 +330,49 @@ function getSpecificQuery()
     if((/^query:/).test(key))
     queryList.push(JSON.parse(props[key]))
   return getRandEl(queryList)
+}
+
+function getUsersList()
+{
+  var queryList = loadQueries()
+  queryList = parseSubmissions(queryList)
+  setHeapQueries(queryList)
+  countAnnotations(queryList)
+  
+  var users = {}
+  for(var i in queryList)
+    for(j in queryList[i].annotations)
+    {
+      if(!users[queryList[i].annotations[j].annotator_id])
+        users[queryList[i].annotations[j].annotator_id] = 1
+      else users[queryList[i].annotations[j].annotator_id]++
+     }
+  
+  var s = ''
+  for(var i in users)s += i + ': ' + String(users[i]) + '\n'
+  return s
+}
+
+function countAnnotations(queryList)
+{
+  var global = getScriptVars()
+  
+  var noAnot = 0
+  
+  var noDescQ = 0
+  
+  for(var i in queryList)
+  {
+    var query = queryList[i]
+    if(query.annotations)if(query.annotations.length > 0)
+    {
+      noAnot += query.annotations.length
+      noDescQ++
+    }
+  }
+  
+  global.noAnot = noAnot
+  global.noDescQ = noDescQ
+  
+  setScriptVars(global)
 }
