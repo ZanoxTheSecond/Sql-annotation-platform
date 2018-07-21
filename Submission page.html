@@ -1,9 +1,22 @@
 <!DOCTYPE html>
 <html>
+
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.12.0/build/styles/default.min.css">
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.12.0/build/highlight.min.js"></script>
+
+
   <head>
     <base target="_top">
   </head>
   <body>
+  
+  <? var url = getScriptUrl()?>
+  
+  <a href = "<?=url?>?page=howto">HOW TO</a>
+  <br>
+  <a href = "<?=url?>?page=monitor">MONITOR</a>
+  <br>
   
    <p>Please insert your email address: </p>
    
@@ -12,17 +25,15 @@
    <p id="emailErMsg" style="color:red"></p>
    
    
-   
    <br>
-   <button onClick="getSpecificQuery(); resetEntryBoxes()">Generate index</button>
+   <button onClick="getSpecificQuery(); resetEntryBoxes()">Generate query</button>
    
-   <input id="index" type="text" readonly = true>
    
    <p id="indexErMsg" style="color:red"></p>
    
    
-   
-   <pre id="sql_plain"></pre>
+   <p> SQL: </p>
+   <pre><code class="sql" id="sql_plain"></code></pre>
    
    <a id="link"></a>
    
@@ -112,25 +123,6 @@ function checkEmail()
  
  async function checkIndex()
  {
-   if(index != Number(document.getElementById("index").value))
-    indexChange = true
-   else indexChange = false
-   
-   index = Number(document.getElementById("index").value)
-   
-   if(document.getElementById("index").value == '')indexState = 'none'
-   else if(isNaN(index))indexState = 'NaN'//not a number
-   else if(index != Math.ceil(index))indexState = 'NaI'//not an integer
-   else if(index < 1 || index > noQueries)indexState = 'OoB'//out of bounds
-   else indexState = 'valid'
-   
-   var indexErMsg
-   if(indexState != 'valid' && indexState != 'none')
-    indexErMsg = 'Index must be an integer between 1 and ' + String(noQueries)
-   else indexErMsg = ''
-   
-   document.getElementById("indexErMsg").innerHTML = indexErMsg
-   
    if(indexState == 'valid' && index != query.index)
    {
     var signal = []
@@ -141,7 +133,8 @@ function checkEmail()
    if(indexState == 'valid')
    {
     document.getElementById("link").innerHTML = 'Test the query here'
-    document.getElementById("sql_plain").innerHTML = 'SQL:\n' + query.sql_plain + '\n'
+    document.getElementById("sql_plain").innerHTML = query.sql_plain
+    hljs.highlightBlock( document.getElementById("sql_plain") )
     document.getElementById("link").href = query.url
    }
    else
@@ -176,7 +169,7 @@ async function tryToSubmit()
  
  if(indexState != 'valid')
  {
-  alert('Please enter an index between 1 and ' + String(noQueries))
+  alert('Please press the "Generate query" button')
   return
  }
  
@@ -192,10 +185,18 @@ async function tryToSubmit()
  entry = document.getElementById("entry4").value
  if(entry != '')entries.push(entry)
  
+ if(entries.length == 0)
+ {
+   alert('You must enter at least one entry')
+   return
+ }
+ 
  var signal = []
  google.script.run.withSuccessHandler(passSignal).withUserObject(signal).submit(email, index, entries)
  while(signal.length == 0){await sleep(100)}
  alert("Your submission has been sent")
+ getSpecificQuery()
+ resetEntryBoxes()
 }
 
 async function getSpecificQuery()
@@ -204,7 +205,7 @@ async function getSpecificQuery()
  google.script.run.withSuccessHandler(setQuery).withUserObject(signal).getSpecificQuery()
  while(signal.length == 0){await sleep(50)}
  index = query.index
- document.getElementById("index").value = String(index)
+ indexState = 'valid'
 }
 
 function passSignal(a, b)
