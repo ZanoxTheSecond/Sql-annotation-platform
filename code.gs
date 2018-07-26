@@ -1,8 +1,15 @@
 function main()
 {
-  //setupQueries(['train.json'])
+//  reset()
   //setHeapQueries()
   //routine()
+//  ScriptApp.newTrigger('routine').timeBased().everyMinutes(1).create()
+}
+
+function reset()
+{
+  PropertiesService.getScriptProperties().deleteAllProperties();
+  setupQueries(['train_anno_123.json'])  
 }
 
 function timeMain()
@@ -93,7 +100,7 @@ function getHSLB()//heap size lower bound (>0, <=heapSize), =heapSize inseamna a
 
 function compareQueries(a, b)
 {
-  return a.sql_plain.length - b.sql_plain.length
+  return a.sql.length - b.sql.length
 }
 
 function getNoQueries()
@@ -144,6 +151,7 @@ function submit(email, index, entries)
   var date = new Date()
   var global = getScriptVars()
   PropertiesService.getScriptProperties().setProperty('request:' + String(date.getMilliseconds()) + String(date.getSeconds()), JSON.stringify([email, index, entries]) )
+  if(!global.nor)global.nor = 0
   global.nor++
   if( PropertiesService.getScriptProperties().getProperty('query:' + String(index)) )
   {
@@ -306,7 +314,7 @@ function setHeapQueries(queryList)
     if(queryList[i].annotations === undefined || queryList[i].annotations.length == 0)
     {
       var query = queryList[i]
-      props['query:' + String(i+1)] = JSON.stringify({index: query.index, sql_plain: query.sql_plain, url: query.url})
+      props['query:' + String(i+1)] = JSON.stringify({index: query.index, sql: query.sql, url: query.url})
       noq++
     }
   PropertiesService.getScriptProperties().setProperties(props)
@@ -320,14 +328,15 @@ function setHeapQueries(queryList)
   setScriptVars(global)
 }
 
-function getSpecificQuery()
+function getQueueQuery()
 {
   var props = PropertiesService.getScriptProperties().getProperties()
   var queryList = []
   for(var key in props)
     if((/^query:/).test(key))
     queryList.push(JSON.parse(props[key]))
-  return getRandEl(queryList)
+  if(queryList.length > 0) return getRandEl(queryList)
+  else return null
 }
 
 function getUsersList()
