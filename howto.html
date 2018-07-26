@@ -4,7 +4,27 @@
     <base target="_top">
   </head>
   <body>
-    <a href='https://meta.stackexchange.com/questions/2677/database-schema-documentation-for-the-public-data-dump-and-sede'>Database Schema Documentation</a><br>
+  
+    There are two main ways to write an annotation for SQL (or code in general):
+    
+    <ol>
+      <li>Attempt a direct 'translation' from code to English - 'What is the [COLUMN1] where [COLUMN2] is [CONSTANT]', for instance: 'What is the population of the country called Romania?'</li>
+      <li>Attempt to describe the answer you are really looking for, assuming you write from the perspective of someone who doesn't know SQL: 'How many people live in Romania?'</li>
+    </ol>
+   
+    <ul>
+      <li> Whenever possible, try to write from the perspective of someone who isn't particularly familiar with SQL or the database schema. </li>
+      <li> The query descriptions should be unambigous: A programmer should be able to directly write the corresponding SQL, without requiring additional information. </li>
+      <li> Try to use synonyms and paraphrasing ("How many inhabitants/people/ .. ", "Count the number of .."). The more varied the descriptions, the more useful they are to us. </li>
+      <li> If you are not sure, skip the current sample with the "Skip" button. </li>
+    </ul>
+ 
+    Useful links:
+    <br><br>
+    <a href='https://meta.stackexchange.com/questions/2677/database-schema-documentation-for-the-public-data-dump-and-sede'>Database Schema Documentation</a><br>    
+    <a href='https://meta.stackexchange.com/questions/250396/database-diagram-of-stack-exchange-model'>Database Diagram</a><br>   
     <a href='https://docs.microsoft.com/en-us/sql/t-sql/language-reference?view=sql-server-2017'>T-SQL Reference</a><br>
-  </body>
+    <br><br>
+    <a href='https://goo.gl/forms/hAmTYaTDNnMWGKUz2'>Feedback</a>
+ </body>
 </html>
