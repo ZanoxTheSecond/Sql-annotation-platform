@@ -13,29 +13,24 @@
   
   <? var url = getScriptUrl()?>
   
-  <a href = "<?=url?>?page=howto">HOW TO</a>
-  <br>
-  <a href = "<?=url?>?page=monitor">MONITOR</a>
+  <a href = "<?=url?>?page=howto">HOW-TO - Useful hints</a>
   <br>
   
-   <p>Please insert your email address: </p>
+   <p>Email address (required): </p>
    
    <input id="email" type="text">
    
    <p id="emailErMsg" style="color:red"></p>
    
    
-   <br>
-   <button onClick="getSpecificQuery(); resetEntryBoxes()">Generate query</button>
-   
    
    <p id="indexErMsg" style="color:red"></p>
    
    
    <p> SQL: </p>
-   <pre><code class="sql" id="sql_plain"></code></pre>
+   <pre><code class="sql" id="sql"></code></pre>
    
-   <a id="link"></a>
+   <a id="link" target="_blank"></a>
    
    <p>Entries:</p>
     
@@ -51,8 +46,17 @@
    
    <button onClick="tryToSubmit()">Submit</button>
    <br>
+   <button onClick="getQueueQuery(); resetEntryBoxes()">Skip</button>
+   <br>
    <p id="noSubs"></p>
-    
+
+
+   <a href = "<?=url?>?page=monitor">Useful stats</a>
+   <br>
+  
+   <a href='https://goo.gl/forms/hAmTYaTDNnMWGKUz2'>How can we improve the experience?</a>
+   <br>
+
   </body>
   
 
@@ -70,7 +74,7 @@ var index
 var indexState = 'none'
 var indexChange = false
 
-var emptyQuery = {index: 0, sql_plain: '', url: ''}
+var emptyQuery = {index: 0, sql: '', url: ''}
 var query = emptyQuery
 
 
@@ -78,6 +82,8 @@ var noQueries
 google.script.run.withFailureHandler(onFailure)
                             .withSuccessHandler(setNoQueries)
                             .getNoQueries()
+                            
+getQueueQuery()
                             
 function setNoQueries(n)
 {
@@ -124,34 +130,34 @@ function checkEmail()
   document.getElementById("emailErMsg").innerHTML = emailErMsg
  }
  
- async function checkIndex()
+async function checkIndex()
  {
-   if(indexState == 'valid' && index != query.index)
-   {
-    var signal = []
-    google.script.run.withSuccessHandler(setQuery).withUserObject(signal).getQuery(index)
-    while(signal.length == 0){await sleep(100)}
-   }
-   
-   if(indexState == 'valid')
-   {
-    document.getElementById("link").innerHTML = 'Test the query here'
-    document.getElementById("sql_plain").innerHTML = query.sql_plain
-    hljs.highlightBlock( document.getElementById("sql_plain") )
-    document.getElementById("link").href = query.url
-   }
-   else
-   {
-    document.getElementById("link").innerHTML = ''
-    document.getElementById("sql_plain").innerHTML = ''
-   }
- }
+  if(indexState == 'valid' && index != query.index)
+  {
+   var signal = []
+   google.script.run.withSuccessHandler(setQuery).withUserObject(signal).getQuery(index)
+   while(signal.length == 0){await sleep(100)}
+  }
+  
+  if(indexState == 'valid')
+  {
+   document.getElementById("link").innerHTML = 'Test the query here'
+   document.getElementById("sql").innerHTML = query.sql
+   hljs.highlightBlock( document.getElementById("sql") )
+   document.getElementById("link").href = query.url
+  }
+  else
+  {
+   document.getElementById("link").innerHTML = ''
+   document.getElementById("sql").innerHTML = ''
+  }
+}
  
- function setQuery(q, signal)
- {
-  query = q
-  signal.push(0)
- }
+function setQuery(q, signal)
+{
+ query = q
+ signal.push(0)
+}
    
 
 
@@ -172,7 +178,7 @@ async function tryToSubmit()
  
  if(indexState != 'valid')
  {
-  alert('Please press the "Generate query" button')
+  alert('The service is currently unavailble')
   return
  }
  
@@ -200,15 +206,29 @@ async function tryToSubmit()
  alert("Your submission has been sent")
  noSubs++
  document.getElementById("noSubs").innerHTML = 'Number of submissions: ' + String(noSubs)
- getSpecificQuery()
+ getQueueQuery()
  resetEntryBoxes()
 }
 
-async function getSpecificQuery()
+async function getQueueQuery()
 {
  var signal = []
- google.script.run.withSuccessHandler(setQuery).withUserObject(signal).getSpecificQuery()
+ query = emptyQuery
+ indexState = 'invalid'
+ google.script.run.withSuccessHandler(setQuery).withUserObject(signal).getQueueQuery()
  while(signal.length == 0){await sleep(50)}
+ if(!query)
+ {
+  signal = []
+  google.script.run.withSuccessHandler(passSignal).withUserObject(signal).routine()
+  while(signal.length == 0){await sleep(50)}
+  
+  signal = []
+  google.script.run.withSuccessHandler(setQuery).withUserObject(signal).getQueueQuery()
+  while(signal.length == 0){await sleep(50)}
+  
+  if(!query)return
+ }
  index = query.index
  indexState = 'valid'
 }
