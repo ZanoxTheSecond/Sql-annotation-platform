@@ -1,9 +1,31 @@
 function main()
 {
-//  reset()
+  //reset()
   //setHeapQueries()
   //routine()
-//  ScriptApp.newTrigger('routine').timeBased().everyMinutes(1).create()
+  //ScriptApp.newTrigger('routine').timeBased().everyMinutes(1).create()
+  //printRegAnnotations()
+}
+
+function printRegAnnotations(queryList)
+{
+  if(!queryList)queryList = loadQueries()
+  for(var i in queryList)
+  {
+    var query = queryList[i]
+    var anot = query.annotations
+    if(anot != null && anot.length > 0)
+    {
+      Logger.log(query.sql)
+      for(var j in anot)
+      {
+        Logger.log(anot[j].annotator_id)
+        Logger.log(anot[j].annotation)
+      }
+      Logger.log(' ')
+      Logger.log(' ')
+    }
+  }
 }
 
 function reset()
